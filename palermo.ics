@@ -116,7 +116,7 @@ BEGIN:VEVENT
 UID:ff3941598e3606755f970be0@palermo-calendar
 DTSTAMP:20260817T000000Z
 SUMMARY:⚽ Palermo – Lecce
-DESCRIPTION:Coppa Italia Frecciarossa 2026/27\\nFonte: dato ufficiale già confermato
+DESCRIPTION:Coppa Italia Frecciarossa 2026/27\\nFonte: Palermo FC (https://www.palermofc.com/it)
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;TZID=Europe/Rome:20260817T211500
@@ -159,7 +159,7 @@ BEGIN:VEVENT
 UID:355f028725458e9b74a5334b@palermo-calendar
 DTSTAMP:20260903T000000Z
 SUMMARY:⚽ Palermo – Mantova
-DESCRIPTION:Coppa Italia Frecciarossa 2026/27\\nFonte: dato ufficiale già confermato
+DESCRIPTION:Coppa Italia Frecciarossa 2026/27\\nFonte: Palermo FC (https://www.palermofc.com/it)
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;TZID=Europe/Rome:20260903T180000
