@@ -16,6 +16,7 @@ import subprocess
 from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
+from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 
@@ -276,38 +277,12 @@ def team_candidate(line, season_start):
     return s
 
 
-def get_official_matches(start):
+def parse_official_listing_html(html, start, source_url):
     """
-    Legge la pagina ufficiale della stagione Palermo FC.
-    Gestisce sia:
-      "Partita precedente Coppa Italia"
-    sulla stessa riga, sia:
-      "Partita precedente"
-      "Coppa Italia"
-    su due righe.
+    Legge i blocchi 'Partita precedente / in programma / Prossima Partita'
+    quando sono presenti nella pagina.
+    Serve anche come fonte per orario e competizione delle singole pagine match.
     """
-    html = None
-    used_url = None
-
-    for url in official_page_candidates(start):
-        try:
-            candidate = rendered_html(url, 12000)
-            text = BeautifulSoup(candidate, "html.parser").get_text("\n", strip=True)
-            if "Palermo" in text and (
-                "Partita precedente" in text
-                or "Partita in programma" in text
-                or "Prossima Partita" in text
-                or "Prossima partita" in text
-            ):
-                html = candidate
-                used_url = url
-                break
-        except Exception as e:
-            print(f"Palermo FC: tentativo {url} fallito ({e})")
-
-    if not html:
-        raise RuntimeError("nessuna pagina ufficiale Palermo valida trovata")
-
     soup = BeautifulSoup(html, "html.parser")
     lines = [
         re.sub(r"\s+", " ", x).strip()
@@ -338,13 +313,12 @@ def get_official_matches(start):
             ):
                 competition = nxt
 
-        competition = normalize_competition(competition or "Palermo FC")
-        markers.append((i, competition))
+        markers.append((i, normalize_competition(competition or "Palermo FC")))
 
     matches = []
 
     for pos, (i, competition) in enumerate(markers):
-        end_i = markers[pos + 1][0] if pos + 1 < len(markers) else min(len(lines), i + 30)
+        end_i = markers[pos + 1][0] if pos + 1 < len(markers) else min(len(lines), i + 32)
         block = lines[i + 1:end_i]
 
         d = None
@@ -366,38 +340,29 @@ def get_official_matches(start):
             if not tm:
                 continue
             candidate = f"{int(tm.group(1)):02d}:{tm.group(2)}"
-            # Sul sito Palermo 00:00 indica normalmente orario non ancora ufficiale.
+            # Sul sito Palermo 00:00 = orario non ancora ufficiale.
             if candidate != "00:00":
                 kick = candidate
-
-            # "20:30 - Stadio Renzo Barbera" oppure "Ore 20:30"
             if " - " in x:
                 loc = x.split(" - ", 1)[1].strip()
                 if loc:
                     location = loc
             break
 
-        # Le squadre sono cercate dopo data/orario, ignorando "/" e risultati.
-        search_block = block[date_index + 1:]
         teams = []
-        for x in search_block:
+        for x in block[date_index + 1:]:
             t = team_candidate(x, start)
             if not t:
                 continue
-
             low = t.lower()
-            # Evita etichette/accessori della pagina che possono comparire nel blocco.
             if any(k in low for k in (
                 "full time", "storico", "formazioni", "acquista il biglietto",
                 "ore ", "match preview", "match center"
             )):
                 continue
-
             if t not in teams:
                 teams.append(t)
-
-            # Appena abbiamo Palermo + un avversario possiamo fermarci.
-            if len(teams) >= 2 and any(x.lower() == "palermo" for x in teams[:2]):
+            if len(teams) >= 2 and any(z.lower() == "palermo" for z in teams[:2]):
                 break
 
         if len(teams) < 2:
@@ -415,20 +380,227 @@ def get_official_matches(start):
             "away": away,
             "competition": competition,
             "location": location,
-            "source": f"Palermo FC ({used_url})",
+            "source": f"Palermo FC ({source_url})",
         })
 
-    # Deduplica: la homepage/pagina stagione può ripetere alcune gare.
     dedup = {}
     for m in matches:
-        dedup[match_key(m)] = m
-    matches = list(dedup.values())
+        key = (m["date"].date(), m["home"].lower(), m["away"].lower())
+        dedup[key] = m
+    return list(dedup.values())
 
-    if not matches:
-        raise RuntimeError("pagina Palermo letta ma nessuna partita riconosciuta")
 
-    print(f"Palermo FC: pagina usata {used_url}")
-    return matches
+def extract_match_links(html, start):
+    """
+    Estrae esclusivamente link della stagione corrente:
+    /it/2627/stagione/match/...
+    /en/2627/season/match/...
+    """
+    c = compact_season(start)
+    soup = BeautifulSoup(html, "html.parser")
+    links = []
+
+    for a in soup.find_all("a", href=True):
+        href = a.get("href", "").strip()
+        if (
+            f"/it/{c}/stagione/match/" in href
+            or f"/en/{c}/season/match/" in href
+        ):
+            url = urljoin("https://www.palermofc.com", href)
+            if url not in links:
+                links.append(url)
+
+    return links
+
+
+def parse_match_page(html, start, url):
+    """
+    Legge una singola pagina match ufficiale.
+    Le prime due intestazioni H2 della Hero Match sono le due squadre.
+    Data e stadio sono letti dalla riga del Match Center/Preview.
+    """
+    soup = BeautifulSoup(html, "html.parser")
+
+    h2 = [
+        re.sub(r"\s+", " ", x.get_text(" ", strip=True)).strip()
+        for x in soup.find_all("h2")
+    ]
+    h2 = [clean_team_line(x) for x in h2 if x]
+
+    teams = []
+    for t in h2:
+        if t not in teams:
+            teams.append(t)
+        if len(teams) == 2:
+            break
+
+    if len(teams) < 2:
+        # Fallback sul testo se la struttura H2 dovesse cambiare.
+        lines = [
+            re.sub(r"\s+", " ", x).strip()
+            for x in soup.get_text("\n", strip=True).splitlines()
+            if x.strip()
+        ]
+        teams = []
+        for x in lines:
+            t = team_candidate(x, start)
+            if not t:
+                continue
+            if t not in teams:
+                teams.append(t)
+            if len(teams) >= 2 and any(z.lower() == "palermo" for z in teams[:2]):
+                break
+
+    if len(teams) < 2:
+        return None
+
+    home, away = teams[0], teams[1]
+    if "palermo" not in {home.lower(), away.lower()}:
+        return None
+
+    text_lines = [
+        re.sub(r"\s+", " ", x).strip()
+        for x in soup.get_text("\n", strip=True).splitlines()
+        if x.strip()
+    ]
+
+    d = None
+    location = ""
+    kick = None
+
+    for x in text_lines:
+        parsed = parse_date(x, start)
+        if parsed and d is None:
+            d = parsed
+
+            # Esempio: "domenica, 13 settembre 2026 | Stadio Partenio..."
+            if "|" in x:
+                loc = x.split("|", 1)[1].strip()
+                if loc:
+                    location = loc
+
+        tm = re.search(r"\b([01]?\d|2[0-3]):([0-5]\d)\b", x)
+        if tm and kick is None:
+            candidate = f"{int(tm.group(1)):02d}:{tm.group(2)}"
+            if candidate != "00:00":
+                kick = candidate
+
+    if not d:
+        return None
+
+    return {
+        "season": season_label(start),
+        "date": d,
+        "time": kick,
+        "home": home,
+        "away": away,
+        "competition": "Palermo FC",
+        "location": location,
+        "source": f"Palermo FC match ({url})",
+    }
+
+
+def get_official_matches(start):
+    """
+    Versione #9:
+    1) usa ESPLICITAMENTE /it/2627/stagione (poi /2728/, /2829/...)
+    2) estrae i link alle singole pagine /stagione/match/...
+    3) legge ogni pagina match ufficiale
+    4) usa il calendario/listing ufficiale per associare competizione e orario
+    5) usa la homepage solo come fallback dei metadati, non come fonte primaria.
+    """
+    c = compact_season(start)
+    season_url = f"https://www.palermofc.com/it/{c}/stagione"
+
+    season_html = rendered_html(season_url, 14000)
+    if "Palermo" not in season_html:
+        raise RuntimeError(f"pagina stagione non valida: {season_url}")
+
+    # Metadati che la pagina stagione espone direttamente, se presenti.
+    listing = parse_official_listing_html(season_html, start, season_url)
+
+    links = extract_match_links(season_html, start)
+
+    # Alcuni rendering del sito non espongono i link del carosello nella pagina stagione.
+    # In quel caso usiamo la homepage SOLO per scoprire link/metadati della stessa stagione.
+    if not links or len(listing) < 2:
+        home_url = "https://www.palermofc.com/it"
+        home_html = rendered_html(home_url, 12000)
+
+        if not links:
+            links = extract_match_links(home_html, start)
+
+        home_listing = parse_official_listing_html(home_html, start, home_url)
+        if len(home_listing) > len(listing):
+            listing = home_listing
+
+    # Mappa metadati per data+squadre e, in fallback, solo per data+squadra avversaria.
+    meta_exact = {}
+    meta_loose = {}
+    for m in listing:
+        exact = (m["date"].date(), m["home"].lower(), m["away"].lower())
+        meta_exact[exact] = m
+        opponent = m["away"] if m["home"].lower() == "palermo" else m["home"]
+        meta_loose[(m["date"].date(), opponent.lower())] = m
+
+    official = []
+
+    for url in links:
+        try:
+            match_html = rendered_html(url, 7000)
+            m = parse_match_page(match_html, start, url)
+            if not m:
+                continue
+
+            exact = (m["date"].date(), m["home"].lower(), m["away"].lower())
+            meta = meta_exact.get(exact)
+
+            if not meta:
+                opponent = m["away"] if m["home"].lower() == "palermo" else m["home"]
+                meta = meta_loose.get((m["date"].date(), opponent.lower()))
+
+            if meta:
+                m["competition"] = meta["competition"]
+                # Il listing è la fonte più affidabile per l'orario ufficiale.
+                if meta.get("time"):
+                    m["time"] = meta["time"]
+                if not m.get("location") and meta.get("location"):
+                    m["location"] = meta["location"]
+
+            official.append(m)
+
+        except Exception as e:
+            print(f"Palermo FC: match non letto {url} ({e})")
+
+    # Se il sito non espone link alle singole pagine, non cancelliamo il lavoro:
+    # usiamo il listing ufficiale già riconosciuto.
+    if not official:
+        if listing:
+            print("Palermo FC: link match non esposti; uso listing ufficiale come fallback")
+            return listing
+        raise RuntimeError("pagina stagione letta ma nessun match ufficiale riconosciuto")
+
+    # Completa con eventuali gare presenti nel listing ma non ancora nelle pagine match.
+    by_exact = {
+        (m["date"].date(), m["home"].lower(), m["away"].lower()): m
+        for m in official
+    }
+    for m in listing:
+        key = (m["date"].date(), m["home"].lower(), m["away"].lower())
+        if key not in by_exact:
+            official.append(m)
+
+    # Deduplica finale.
+    dedup = {}
+    for m in official:
+        key = (m["date"].date(), m["home"].lower(), m["away"].lower())
+        dedup[key] = m
+    official = list(dedup.values())
+
+    print(f"Palermo FC: pagina stagione primaria {season_url}")
+    print(f"Palermo FC: {len(links)} link match stagionali trovati")
+    print(f"Palermo FC: {len(official)} partite ufficiali riconosciute")
+    return official
 
 
 def static_matches(rows, season):
