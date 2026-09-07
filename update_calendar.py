@@ -233,14 +233,16 @@ def get_serie_b_matches(start):
 
 def official_page_candidates(start):
     """
-    Prova URL stagionali e URL legacy attualmente usato dal sito.
-    Il primo che contiene la sezione Partite viene usato.
+    URL ufficiali costruiti automaticamente dalla stagione:
+    2026/27 -> /it/2627/stagione
+    2027/28 -> /it/2728/stagione
+    ecc.
     """
     c = compact_season(start)
     return [
-        f"https://www.palermofc.com/it/{c}/squadre/prima-squadra",
         f"https://www.palermofc.com/it/{c}/stagione",
-        "https://www.palermofc.com/it/2526/squadre/prima-squadra",
+        f"https://www.palermofc.com/it/{c}/squadre/prima-squadra",
+        "https://www.palermofc.com/it",
     ]
 
 
@@ -276,26 +278,32 @@ def team_candidate(line, season_start):
 
 def get_official_matches(start):
     """
-    Parser generico della sezione 'Partite' del sito Palermo.
-    È indipendente dalla categoria: può quindi continuare a funzionare
-    anche se il Palermo cambia campionato.
+    Legge la pagina ufficiale della stagione Palermo FC.
+    Gestisce sia:
+      "Partita precedente Coppa Italia"
+    sulla stessa riga, sia:
+      "Partita precedente"
+      "Coppa Italia"
+    su due righe.
     """
     html = None
     used_url = None
 
     for url in official_page_candidates(start):
         try:
-            candidate = rendered_html(url, 10000)
-            if "Palermo" in candidate and (
-                "Partita precedente" in candidate
-                or "Partita in programma" in candidate
-                or "Prossima Partita" in candidate
+            candidate = rendered_html(url, 12000)
+            text = BeautifulSoup(candidate, "html.parser").get_text("\n", strip=True)
+            if "Palermo" in text and (
+                "Partita precedente" in text
+                or "Partita in programma" in text
+                or "Prossima Partita" in text
+                or "Prossima partita" in text
             ):
                 html = candidate
                 used_url = url
                 break
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"Palermo FC: tentativo {url} fallito ({e})")
 
     if not html:
         raise RuntimeError("nessuna pagina ufficiale Palermo valida trovata")
@@ -307,50 +315,89 @@ def get_official_matches(start):
         if x.strip()
     ]
 
-    markers = []
-    marker_re = re.compile(
-        r"^(Partita precedente|Partita in programma|Prossima Partita)\s+(.+)$",
-        re.I,
+    marker_words = (
+        "Partita precedente",
+        "Partita in programma",
+        "Prossima Partita",
+        "Prossima partita",
     )
 
-    for i, x in enumerate(lines):
-        m = marker_re.match(x)
-        if m:
-            markers.append((i, normalize_competition(m.group(2))))
+    markers = []
+    for i, line in enumerate(lines):
+        marker = next((m for m in marker_words if line.startswith(m)), None)
+        if not marker:
+            continue
+
+        competition = line[len(marker):].strip(" :-")
+        if not competition and i + 1 < len(lines):
+            nxt = lines[i + 1].strip()
+            if (
+                len(nxt) <= 50
+                and not parse_date(nxt, start)
+                and not re.search(r"\b([01]?\d|2[0-3]):[0-5]\d\b", nxt)
+            ):
+                competition = nxt
+
+        competition = normalize_competition(competition or "Palermo FC")
+        markers.append((i, competition))
 
     matches = []
 
     for pos, (i, competition) in enumerate(markers):
-        end = markers[pos + 1][0] if pos + 1 < len(markers) else min(len(lines), i + 24)
-        block = lines[i + 1:end]
+        end_i = markers[pos + 1][0] if pos + 1 < len(markers) else min(len(lines), i + 30)
+        block = lines[i + 1:end_i]
 
-        d = next((parse_date(x, start) for x in block if parse_date(x, start)), None)
+        d = None
+        date_index = None
+        for j, x in enumerate(block):
+            parsed = parse_date(x, start)
+            if parsed:
+                d = parsed
+                date_index = j
+                break
         if not d:
             continue
 
         kick = None
         location = ""
 
-        for x in block:
+        for x in block[date_index + 1:]:
             tm = re.search(r"\b([01]?\d|2[0-3]):([0-5]\d)\b", x)
-            if tm:
-                candidate = f"{int(tm.group(1)):02d}:{tm.group(2)}"
-                if candidate != "00:00":
-                    kick = candidate
+            if not tm:
+                continue
+            candidate = f"{int(tm.group(1)):02d}:{tm.group(2)}"
+            # Sul sito Palermo 00:00 indica normalmente orario non ancora ufficiale.
+            if candidate != "00:00":
+                kick = candidate
 
-                # Esempio: "21:15 - Stadio Renzo Barbera"
-                if " - " in x:
-                    loc = x.split(" - ", 1)[1].strip()
-                    if loc:
-                        location = loc
-                break
+            # "20:30 - Stadio Renzo Barbera" oppure "Ore 20:30"
+            if " - " in x:
+                loc = x.split(" - ", 1)[1].strip()
+                if loc:
+                    location = loc
+            break
 
+        # Le squadre sono cercate dopo data/orario, ignorando "/" e risultati.
+        search_block = block[date_index + 1:]
         teams = []
-        for x in block:
+        for x in search_block:
             t = team_candidate(x, start)
-            if t and t not in teams:
+            if not t:
+                continue
+
+            low = t.lower()
+            # Evita etichette/accessori della pagina che possono comparire nel blocco.
+            if any(k in low for k in (
+                "full time", "storico", "formazioni", "acquista il biglietto",
+                "ore ", "match preview", "match center"
+            )):
+                continue
+
+            if t not in teams:
                 teams.append(t)
-            if len(teams) >= 2:
+
+            # Appena abbiamo Palermo + un avversario possiamo fermarci.
+            if len(teams) >= 2 and any(x.lower() == "palermo" for x in teams[:2]):
                 break
 
         if len(teams) < 2:
@@ -371,9 +418,16 @@ def get_official_matches(start):
             "source": f"Palermo FC ({used_url})",
         })
 
+    # Deduplica: la homepage/pagina stagione può ripetere alcune gare.
+    dedup = {}
+    for m in matches:
+        dedup[match_key(m)] = m
+    matches = list(dedup.values())
+
     if not matches:
         raise RuntimeError("pagina Palermo letta ma nessuna partita riconosciuta")
 
+    print(f"Palermo FC: pagina usata {used_url}")
     return matches
 
 
