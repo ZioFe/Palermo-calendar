@@ -32,13 +32,13 @@ TEAMS = {
     "PIS": "Pisa",
     "VIC": "L.R. Vicenza",
     "ASC": "Ascoli",
-    "CAT": "Catanzaro",
+    "CTZ": "Catanzaro",
     "SUD": "Südtirol",
     "BEN": "Benevento",
     "VER": "Hellas Verona",
     "CRE": "Cremonese",
     "CES": "Cesena",
-    "ENT": "Virtus Entella",
+    "VIR": "Virtus Entella",
     "MOD": "Modena",
 }
 
@@ -80,16 +80,15 @@ def get_matches():
 
     soup = BeautifulSoup(r.text, "html.parser")
     text = soup.get_text("\n", strip=True)
-
     lines = [x.strip() for x in text.splitlines() if x.strip()]
 
     matches = []
 
     for i, line in enumerate(lines):
-        if not re.search(r"\d+[ªa]\s*Giornata", line, re.I):
+        if not re.search(r"\d+\s*[ªa]\s*Giornata", line, re.I):
             continue
 
-        block = lines[i:i+18]
+        block = lines[i:i+30]
 
         date_obj = None
         for x in block:
@@ -100,13 +99,16 @@ def get_matches():
         if not date_obj:
             continue
 
-        codes = [x for x in block if x in TEAMS]
+        team_codes = [
+            x for x in block
+            if x in TEAMS
+        ]
 
-        if len(codes) < 2:
+        if len(team_codes) < 2:
             continue
 
-        home_code = codes[0]
-        away_code = codes[1]
+        home_code = team_codes[0]
+        away_code = team_codes[1]
 
         if "PAL" not in (home_code, away_code):
             continue
@@ -116,7 +118,13 @@ def get_matches():
         for x in block:
             m = re.fullmatch(r"(\d{1,2}):(\d{2})", x)
             if m:
-                time_value = x
+                candidate = x
+
+                # 01:00 / 02:00 nelle future giornate della pagina
+                # sono placeholder tecnici, non orari ufficiali.
+                if candidate not in ("01:00", "02:00"):
+                    time_value = candidate
+
                 break
 
         matches.append({
@@ -132,7 +140,7 @@ def get_matches():
         )
 
     return matches
-
+    
 def build_calendar(matches):
     now = datetime.now(ZoneInfo("UTC")).strftime("%Y%m%dT%H%M%SZ")
 
