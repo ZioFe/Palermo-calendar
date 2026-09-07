@@ -1,4 +1,14 @@
 #!/usr/bin/env python3
+"""
+Palermo FC -> iCalendar
+- stagione calcolata automaticamente (es. 2026/27 -> 2027/28)
+- Serie B: fonte Lega B, quando il Palermo partecipa alla Serie B
+- tutte le competizioni: pagina ufficiale Palermo FC come fonte generale/fallback
+- amichevoli 2026 già note: conservate nel feed
+- UID stabili: gli spostamenti di data/ora aggiornano lo stesso evento
+- nessuna sovrascrittura del feed se le fonti principali falliscono
+"""
+
 import hashlib
 import re
 import shutil
@@ -9,30 +19,25 @@ from zoneinfo import ZoneInfo
 
 from bs4 import BeautifulSoup
 
-SERIE_B_URL = "https://www.legab.it/seriebkt/calendario/2026-2027/stagione-regolare/palermo"
-PALERMO_PAGE = "https://www.palermofc.com/it/2526/squadre/prima-squadra"
-
 OUT = Path("palermo.ics")
 TZ = ZoneInfo("Europe/Rome")
 
 MONTHS = {
     "gennaio": 1, "febbraio": 2, "marzo": 3, "aprile": 4,
     "maggio": 5, "giugno": 6, "luglio": 7, "agosto": 8,
-    "settembre": 9, "ottobre": 10, "novembre": 11, "dicembre": 12
+    "settembre": 9, "ottobre": 10, "novembre": 11, "dicembre": 12,
 }
 
-TEAMS = {
+TEAMS_B = {
     "PAL": "Palermo", "JST": "Juve Stabia", "ARE": "Arezzo", "SAM": "Sampdoria",
     "AVE": "Avellino", "PAD": "Padova", "EMP": "Empoli", "MAN": "Mantova",
     "CAR": "Carrarese", "PIS": "Pisa", "VIC": "L.R. Vicenza", "ASC": "Ascoli",
     "CTZ": "Catanzaro", "SUD": "Südtirol", "BEN": "Benevento",
     "VER": "Hellas Verona", "CRE": "Cremonese", "CES": "Cesena",
-    "VIR": "Virtus Entella", "MOD": "Modena"
+    "VIR": "Virtus Entella", "MOD": "Modena",
 }
 
-# Amichevoli ufficiali 2026 già annunciate/disputate.
-# Gli orari di Paradiso e Nürnberg sono quelli effettivamente comunicati
-# dal Palermo il giorno della gara (17:15 e 16:30).
+# Amichevoli ufficiali 2026 già note/disputate.
 KNOWN_FRIENDLIES = [
     ("2026-07-15", "17:30", "Palermo", "FC Gherdëina",
      "Amichevole", "Centro Sportivo Mulin da Coi, Santa Cristina in Valgardena (BZ)"),
@@ -50,12 +55,32 @@ KNOWN_FRIENDLIES = [
      "Amichevole", "HBF Park, Perth"),
 ]
 
-# Fallback sicuro: se il sito Palermo cambia struttura, queste gare di Coppa
-# restano comunque nel feed invece di sparire.
+# Fallback delle gare di Coppa già confermate nel 2026/27.
 KNOWN_COPPA = [
-    ("2026-08-17", "21:15", "Palermo", "Lecce", "Coppa Italia Frecciarossa", "Stadio Renzo Barbera"),
-    ("2026-09-03", "18:00", "Palermo", "Mantova", "Coppa Italia Frecciarossa", "Stadio Renzo Barbera"),
+    ("2026-08-17", "21:15", "Palermo", "Lecce",
+     "Coppa Italia Frecciarossa", "Stadio Renzo Barbera"),
+    ("2026-09-03", "18:00", "Palermo", "Mantova",
+     "Coppa Italia Frecciarossa", "Stadio Renzo Barbera"),
 ]
+
+
+def season_start_year(now=None):
+    """La stagione italiana cambia a luglio: 2026-09 -> 2026/27, 2027-07 -> 2027/28."""
+    now = now or datetime.now(TZ)
+    return now.year if now.month >= 7 else now.year - 1
+
+
+def season_label(start):
+    return f"{start}/{str(start + 1)[-2:]}"
+
+
+def season_path(start):
+    return f"{start}-{start + 1}"
+
+
+def compact_season(start):
+    return f"{str(start)[-2:]}{str(start + 1)[-2:]}"
+
 
 def esc(s):
     return (
@@ -66,24 +91,45 @@ def esc(s):
         .replace(";", "\\;")
     )
 
-def stable_uid(competition, home, away):
-    # Niente data/ora nell'UID: se una partita viene spostata, Apple aggiorna
-    # l'evento invece di crearne uno nuovo.
-    raw = f"2026-27|{competition}|{home}|{away}".lower().encode("utf-8")
+
+def normalize_competition(name):
+    n = re.sub(r"\s+", " ", name.strip())
+    low = n.lower()
+    if "serie b" in low:
+        return "Serie BKT"
+    if "coppa italia" in low:
+        return "Coppa Italia Frecciarossa"
+    if "amichevol" in low:
+        return "Amichevole"
+    return n
+
+
+def stable_uid(season, competition, home, away):
+    # Data e ora non fanno parte dell'UID: se cambiano, Apple aggiorna lo stesso evento.
+    raw = f"{season}|{normalize_competition(competition)}|{home}|{away}".lower().encode("utf-8")
     return hashlib.sha1(raw).hexdigest()[:24] + "@palermo-calendar"
 
-def parse_date(text):
+
+def parse_date(text, season_start):
     m = re.search(
         r"(\d{1,2})\s+"
-        r"(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)",
-        text.lower()
+        r"(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)"
+        r"(?:\s+(\d{4}))?",
+        text.lower(),
     )
     if not m:
         return None
     day = int(m.group(1))
     month = MONTHS[m.group(2)]
-    year = 2026 if month >= 7 else 2027
-    return datetime(year, month, day)
+    if m.group(3):
+        year = int(m.group(3))
+    else:
+        year = season_start if month >= 7 else season_start + 1
+    try:
+        return datetime(year, month, day)
+    except ValueError:
+        return None
+
 
 def chrome_path():
     return (
@@ -93,26 +139,41 @@ def chrome_path():
         or shutil.which("chromium-browser")
     )
 
+
 def rendered_html(url, budget=10000):
     chrome = chrome_path()
     if not chrome:
         raise RuntimeError("Chrome/Chromium non trovato sul runner GitHub")
 
     cmd = [
-        chrome, "--headless", "--no-sandbox", "--disable-gpu",
+        chrome,
+        "--headless",
+        "--no-sandbox",
+        "--disable-gpu",
         "--disable-dev-shm-usage",
         f"--virtual-time-budget={budget}",
-        "--dump-dom", url
+        "--dump-dom",
+        url,
     ]
     p = subprocess.run(cmd, capture_output=True, text=True, timeout=50)
     if p.returncode != 0:
         raise RuntimeError("Chrome failed: " + p.stderr[-1200:])
     return p.stdout
 
-def get_serie_b_matches():
-    html = rendered_html(SERIE_B_URL, 10000)
+
+def get_serie_b_matches(start):
+    """
+    Fonte prioritaria quando Palermo è in Serie B.
+    L'URL cambia automaticamente: 2026-2027 -> 2027-2028 -> ...
+    """
+    url = (
+        "https://www.legab.it/seriebkt/calendario/"
+        f"{season_path(start)}/stagione-regolare/palermo"
+    )
+
+    html = rendered_html(url, 10000)
     if "Palermo" not in html or "Giornata" not in html:
-        raise RuntimeError("La pagina Lega B renderizzata non contiene il calendario atteso")
+        raise RuntimeError("pagina Lega B non valida per questa stagione")
 
     soup = BeautifulSoup(html, "html.parser")
     lines = [
@@ -124,17 +185,17 @@ def get_serie_b_matches():
     starts = [i for i, x in enumerate(lines) if "Giornata" in x]
     matches = []
 
-    for pos, start in enumerate(starts):
-        end = starts[pos + 1] if pos + 1 < len(starts) else min(len(lines), start + 60)
-        block = lines[start:end]
+    for pos, i in enumerate(starts):
+        end = starts[pos + 1] if pos + 1 < len(starts) else min(len(lines), i + 60)
+        block = lines[i:end]
 
-        d = next((parse_date(x) for x in block if parse_date(x)), None)
+        d = next((parse_date(x, start) for x in block if parse_date(x, start)), None)
         if not d:
             continue
 
         codes = []
         for x in block:
-            if x in TEAMS and x not in codes:
+            if x in TEAMS_B and x not in codes:
                 codes.append(x)
 
         if len(codes) < 2:
@@ -146,55 +207,99 @@ def get_serie_b_matches():
 
         kick = None
         for x in block:
-            if re.fullmatch(r"([01]?\d|2[0-3]):[0-5]\d", x) and x not in {"01:00", "02:00"}:
-                kick = x
+            if re.fullmatch(r"([01]?\d|2[0-3]):[0-5]\d", x):
+                # 01:00 / 02:00 sono stati usati come placeholder tecnici.
+                if x not in {"00:00", "01:00", "02:00"}:
+                    kick = x
                 break
 
         matches.append({
+            "season": season_label(start),
             "date": d,
             "time": kick,
-            "home": TEAMS[home_code],
-            "away": TEAMS[away_code],
+            "home": TEAMS_B[home_code],
+            "away": TEAMS_B[away_code],
             "competition": "Serie BKT",
             "location": "",
+            "source": "Lega Serie B",
         })
 
+    # La Serie B ha 38 gare. Se il formato cambia non fidarsi di un risultato parziale.
     if len(matches) != 38:
-        raise RuntimeError(
-            f"Parsing Serie B fallito: trovate {len(matches)} partite, attese 38. "
-            "palermo.ics non viene sovrascritto."
-        )
+        raise RuntimeError(f"Lega B: trovate {len(matches)} partite, attese 38")
 
     return matches
 
+
+def official_page_candidates(start):
+    """
+    Prova URL stagionali e URL legacy attualmente usato dal sito.
+    Il primo che contiene la sezione Partite viene usato.
+    """
+    c = compact_season(start)
+    return [
+        f"https://www.palermofc.com/it/{c}/squadre/prima-squadra",
+        f"https://www.palermofc.com/it/{c}/stagione",
+        "https://www.palermofc.com/it/2526/squadre/prima-squadra",
+    ]
+
+
 def clean_team_line(line):
-    # "Palermo 5" -> "Palermo"; "Mantova 2" -> "Mantova"
-    s = re.sub(r"\s+\d+$", "", line).strip()
+    # Rimuove risultato finale: "Palermo 5" -> "Palermo"
+    return re.sub(r"\s+\d+$", "", line.strip())
+
+
+def team_candidate(line, season_start):
+    s = clean_team_line(line)
+    low = s.lower()
+
+    if not s or s.startswith("Image"):
+        return None
+    if s in {"/", "-", "Risultato"}:
+        return None
+    if parse_date(s, season_start):
+        return None
+    if re.search(r"\b([01]?\d|2[0-3]):[0-5]\d\b", s):
+        return None
+
+    bad = (
+        "match center", "acquista", "partita precedente", "partita in programma",
+        "prossima partita", "stadio ", "calendario", "classifica", "scopri",
+        "serie bkt", "coppa italia", "news", "next matches", "partite",
+    )
+    if any(x in low for x in bad):
+        return None
+    if not (2 <= len(s) <= 45):
+        return None
     return s
 
-def looks_like_team(s):
-    bad = (
-        "partita precedente", "partita in programma", "prossima partita",
-        "coppa italia", "serie b", "match center", "acquista",
-        "stadio ", "calendario", "news", "scopri", "image", "ore "
-    )
-    low = s.lower()
-    if not s or any(x in low for x in bad):
-        return False
-    if re.search(r"\d{1,2}:\d{2}", s):
-        return False
-    if parse_date(s):
-        return False
-    if s in {"/", "-", "Risultato"}:
-        return False
-    return 2 <= len(s) <= 40
 
-def get_coppa_matches():
+def get_official_matches(start):
     """
-    Prova a leggere automaticamente le gare di Coppa Italia dalla pagina
-    ufficiale del Palermo. Se la struttura cambia, il chiamante usa il fallback.
+    Parser generico della sezione 'Partite' del sito Palermo.
+    È indipendente dalla categoria: può quindi continuare a funzionare
+    anche se il Palermo cambia campionato.
     """
-    html = rendered_html(PALERMO_PAGE, 10000)
+    html = None
+    used_url = None
+
+    for url in official_page_candidates(start):
+        try:
+            candidate = rendered_html(url, 10000)
+            if "Palermo" in candidate and (
+                "Partita precedente" in candidate
+                or "Partita in programma" in candidate
+                or "Prossima Partita" in candidate
+            ):
+                html = candidate
+                used_url = url
+                break
+        except Exception:
+            pass
+
+    if not html:
+        raise RuntimeError("nessuna pagina ufficiale Palermo valida trovata")
+
     soup = BeautifulSoup(html, "html.parser")
     lines = [
         re.sub(r"\s+", " ", x).strip()
@@ -202,87 +307,110 @@ def get_coppa_matches():
         if x.strip()
     ]
 
-    found = []
+    markers = []
+    marker_re = re.compile(
+        r"^(Partita precedente|Partita in programma|Prossima Partita)\s+(.+)$",
+        re.I,
+    )
 
-    for i, line in enumerate(lines):
-        if "Coppa Italia" not in line:
-            continue
+    for i, x in enumerate(lines):
+        m = marker_re.match(x)
+        if m:
+            markers.append((i, normalize_competition(m.group(2))))
 
-        block = lines[i:i + 18]
-        d = next((parse_date(x) for x in block if parse_date(x)), None)
+    matches = []
+
+    for pos, (i, competition) in enumerate(markers):
+        end = markers[pos + 1][0] if pos + 1 < len(markers) else min(len(lines), i + 24)
+        block = lines[i + 1:end]
+
+        d = next((parse_date(x, start) for x in block if parse_date(x, start)), None)
         if not d:
             continue
 
         kick = None
         location = ""
+
         for x in block:
             tm = re.search(r"\b([01]?\d|2[0-3]):([0-5]\d)\b", x)
             if tm:
                 candidate = f"{int(tm.group(1)):02d}:{tm.group(2)}"
                 if candidate != "00:00":
                     kick = candidate
-            if x.lower().startswith("stadio "):
-                location = x
 
-        # Cerca le due squadre nell'ordine visualizzato dalla pagina.
-        candidates = []
+                # Esempio: "21:15 - Stadio Renzo Barbera"
+                if " - " in x:
+                    loc = x.split(" - ", 1)[1].strip()
+                    if loc:
+                        location = loc
+                break
+
+        teams = []
         for x in block:
-            y = clean_team_line(x)
-            if looks_like_team(y) and y not in candidates:
-                candidates.append(y)
+            t = team_candidate(x, start)
+            if t and t not in teams:
+                teams.append(t)
+            if len(teams) >= 2:
+                break
 
-        if "Palermo" not in candidates:
+        if len(teams) < 2:
             continue
 
-        pidx = candidates.index("Palermo")
-        other = None
-        if pidx > 0:
-            other = candidates[pidx - 1]
-            home, away = other, "Palermo"
-        elif pidx + 1 < len(candidates):
-            other = candidates[pidx + 1]
-            home, away = "Palermo", other
-        else:
+        home, away = teams[0], teams[1]
+        if "palermo" not in {home.lower(), away.lower()}:
             continue
 
-        # Evita falsi positivi evidenti.
-        if other.lower() in {"palermo fc", "prima squadra"}:
-            continue
+        matches.append({
+            "season": season_label(start),
+            "date": d,
+            "time": kick,
+            "home": home,
+            "away": away,
+            "competition": competition,
+            "location": location,
+            "source": f"Palermo FC ({used_url})",
+        })
 
-        item = {
-            "date": d, "time": kick, "home": home, "away": away,
-            "competition": "Coppa Italia Frecciarossa", "location": location
-        }
+    if not matches:
+        raise RuntimeError("pagina Palermo letta ma nessuna partita riconosciuta")
 
-        key = (home.lower(), away.lower())
-        if not any((m["home"].lower(), m["away"].lower()) == key for m in found):
-            found.append(item)
+    return matches
 
-    return found
 
-def static_matches(rows):
-    out = []
+def static_matches(rows, season):
+    result = []
     for date_s, time_s, home, away, competition, location in rows:
-        out.append({
+        result.append({
+            "season": season,
             "date": datetime.strptime(date_s, "%Y-%m-%d"),
             "time": time_s,
             "home": home,
             "away": away,
             "competition": competition,
             "location": location,
+            "source": "dato ufficiale già confermato",
         })
-    return out
+    return result
 
-def merge_unique(*groups):
+
+def match_key(m):
+    return stable_uid(m["season"], m["competition"], m["home"], m["away"])
+
+
+def merge_prefer_later(*groups):
+    """
+    I gruppi successivi hanno precedenza.
+    Esempio: Palermo ufficiale -> Lega B, così gli orari Lega B più aggiornati
+    sovrascrivono lo stesso incontro senza duplicarlo.
+    """
     merged = {}
     for group in groups:
         for m in group:
-            key = stable_uid(m["competition"], m["home"], m["away"])
-            merged[key] = m
+            merged[match_key(m)] = m
     return list(merged.values())
 
+
 def build_calendar(matches):
-    now = datetime.now(ZoneInfo("UTC")).strftime("%Y%m%dT%H%M%SZ")
     out = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
@@ -300,18 +428,17 @@ def build_calendar(matches):
     for m in matches:
         d = m["date"]
         title = f"⚽ {m['home']} – {m['away']}"
-        uid = stable_uid(m["competition"], m["home"], m["away"])
+        uid = match_key(m)
 
-        desc = f"{m['competition']} 2026/27"
-        if m["competition"] == "Serie BKT":
-            desc += "\\nFonte: Lega Serie B"
-        else:
-            desc += "\\nFonte: Palermo FC / fonte ufficiale"
+        # DTSTAMP stabile: evita un commit GitHub inutile ogni 6 ore.
+        stamp = f"{d.strftime('%Y%m%d')}T000000Z"
+
+        desc = f"{m['competition']} {m['season']}\\nFonte: {m['source']}"
 
         out += [
             "BEGIN:VEVENT",
             f"UID:{uid}",
-            f"DTSTAMP:{now}",
+            f"DTSTAMP:{stamp}",
             f"SUMMARY:{esc(title)}",
             f"DESCRIPTION:{esc(desc)}",
             "TRANSP:TRANSPARENT",
@@ -322,12 +449,12 @@ def build_calendar(matches):
 
         if m["time"]:
             hh, mm = map(int, m["time"].split(":"))
-            start = datetime(d.year, d.month, d.day, hh, mm, tzinfo=TZ)
-            end = start + timedelta(hours=2)
+            start_dt = datetime(d.year, d.month, d.day, hh, mm, tzinfo=TZ)
+            end_dt = start_dt + timedelta(hours=2)
 
             out += [
-                f"DTSTART;TZID=Europe/Rome:{start.strftime('%Y%m%dT%H%M%S')}",
-                f"DTEND;TZID=Europe/Rome:{end.strftime('%Y%m%dT%H%M%S')}",
+                f"DTSTART;TZID=Europe/Rome:{start_dt.strftime('%Y%m%dT%H%M%S')}",
+                f"DTEND;TZID=Europe/Rome:{end_dt.strftime('%Y%m%dT%H%M%S')}",
                 "BEGIN:VALARM",
                 "TRIGGER:-PT1H",
                 "ACTION:DISPLAY",
@@ -346,35 +473,52 @@ def build_calendar(matches):
     out.append("END:VCALENDAR")
     return "\r\n".join(out) + "\r\n"
 
+
 def main():
-    # Serie B è la fonte critica: se fallisce non sovrascriviamo il calendario.
-    serie_b = get_serie_b_matches()
+    current_start = season_start_year()
+    current_season = season_label(current_start)
 
-    friendlies = static_matches(KNOWN_FRIENDLIES)
-    coppa_fallback = static_matches(KNOWN_COPPA)
+    print(f"Stagione rilevata automaticamente: {current_season}")
 
-    # Coppa Italia è indipendente: se il sito Palermo cambia struttura,
-    # manteniamo almeno le gare già note e la Serie B continua ad aggiornarsi.
+    official = []
+    serie_b = []
+
     try:
-        coppa_live = get_coppa_matches()
-        if coppa_live:
-            coppa = merge_unique(coppa_fallback, coppa_live)
-            print(f"Coppa Italia: {len(coppa_live)} gare lette automaticamente dal sito Palermo")
-        else:
-            coppa = coppa_fallback
-            print("Coppa Italia: parser live senza risultati; uso fallback noto")
+        official = get_official_matches(current_start)
+        print(f"Palermo FC: {len(official)} partite lette dalla pagina ufficiale")
     except Exception as e:
-        coppa = coppa_fallback
-        print(f"Coppa Italia: fallback attivato ({e})")
+        print(f"Palermo FC: fonte ufficiale non disponibile ({e})")
 
-    matches = merge_unique(serie_b, friendlies, coppa)
+    try:
+        serie_b = get_serie_b_matches(current_start)
+        print(f"Lega B: {len(serie_b)} partite lette")
+    except Exception as e:
+        # Non è necessariamente un errore: il Palermo potrebbe essere in un'altra categoria.
+        print(f"Lega B: non usata ({e})")
+
+    # Protezione fondamentale: non cancellare il feed se entrambe le fonti vive falliscono.
+    if not official and not serie_b:
+        raise RuntimeError(
+            "Nessuna fonte viva ha prodotto partite: palermo.ics non viene sovrascritto."
+        )
+
+    # Storico 2026/27 conservato.
+    historical = static_matches(KNOWN_FRIENDLIES, "2026/27")
+    historical += static_matches(KNOWN_COPPA, "2026/27")
+
+    # Il parser Palermo è generico (campionato/coppa/amichevoli se presenti);
+    # Lega B ha precedenza per le gare di campionato perché è la fonte specifica.
+    matches = merge_prefer_later(historical, official, serie_b)
+
     OUT.write_text(build_calendar(matches), encoding="utf-8")
 
-    print(
-        f"Creato calendario: {len(serie_b)} Serie B + "
-        f"{len(coppa)} Coppa Italia + {len(friendlies)} amichevoli = "
-        f"{len(matches)} eventi"
-    )
+    competitions = {}
+    for m in matches:
+        competitions[m["competition"]] = competitions.get(m["competition"], 0) + 1
+
+    detail = " + ".join(f"{n} {c}" for c, n in sorted(competitions.items()))
+    print(f"Creato calendario: {detail} = {len(matches)} eventi")
+
 
 if __name__ == "__main__":
     main()
