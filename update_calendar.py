@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 
 TZ = ZoneInfo("Europe/Rome")
 OUT = Path("palermo.ics")
-TEAM_PAGE = "https://www.palermofc.com/it/2526/squadre/prima-squadra"
+TEAM_PAGE = "https://www.palermofc.com/it/2627/stagione"
 
 MONTHS = {
     "gennaio":1,"febbraio":2,"marzo":3,"aprile":4,"maggio":5,"giugno":6,
