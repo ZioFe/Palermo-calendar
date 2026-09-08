@@ -625,14 +625,50 @@ def match_key(m):
 
 def merge_prefer_later(*groups):
     """
-    I gruppi successivi hanno precedenza.
-    Esempio: Palermo ufficiale -> Lega B, così gli orari Lega B più aggiornati
-    sovrascrivono lo stesso incontro senza duplicarlo.
+    I gruppi successivi hanno precedenza, ma senza perdere dati utili
+    già presenti nelle fonti precedenti.
+
+    Caso principale:
+    - Palermo FC fornisce lo stadio/località.
+    - Lega B può fornire data/orario più aggiornati.
+    - Quando Lega B sostituisce la stessa gara, conserva LOCATION
+      e gli altri campi che la nuova fonte non valorizza.
     """
     merged = {}
+
     for group in groups:
         for m in group:
-            merged[match_key(m)] = m
+            key = match_key(m)
+
+            if key not in merged:
+                merged[key] = dict(m)
+                continue
+
+            previous = merged[key]
+            current = dict(m)
+
+            # Se la nuova fonte non ha lo stadio, conserva quello già trovato.
+            if not current.get("location") and previous.get("location"):
+                current["location"] = previous["location"]
+
+            # Se la nuova fonte non ha ancora un orario ufficiale,
+            # conserva un eventuale orario valido già disponibile.
+            if not current.get("time") and previous.get("time"):
+                current["time"] = previous["time"]
+
+            # Conserva una fonte già valorizzata se la nuova è vuota.
+            if not current.get("source") and previous.get("source"):
+                current["source"] = previous["source"]
+
+            # Evita di sostituire una competizione precisa con un'etichetta generica.
+            if (
+                current.get("competition") in {None, "", "Palermo FC"}
+                and previous.get("competition")
+            ):
+                current["competition"] = previous["competition"]
+
+            merged[key] = current
+
     return list(merged.values())
 
 
