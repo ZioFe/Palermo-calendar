@@ -672,6 +672,18 @@ def merge_prefer_later(*groups):
     return list(merged.values())
 
 
+def transmission_for_match(m):
+    """Diritti confermati per la stagione 2026/27; non estendere a stagioni future."""
+    season = m.get("season", "")
+    competition = normalize_competition(m.get("competition", ""))
+    if season == "2026/27":
+        if competition == "Serie BKT":
+            return "DAZN; LaB Channel (Prime Video, OneFootball)"
+        if competition == "Coppa Italia Frecciarossa":
+            return "Mediaset (TV); Mediaset Infinity (streaming)"
+    return "Trasmissione da confermare"
+
+
 def build_calendar(matches):
     out = [
         "BEGIN:VCALENDAR",
@@ -695,7 +707,7 @@ def build_calendar(matches):
         # DTSTAMP stabile: evita un commit GitHub inutile ogni 6 ore.
         stamp = f"{d.strftime('%Y%m%d')}T000000Z"
 
-        desc = f"{m['competition']} {m['season']}\\nFonte: {m['source']}"
+        desc = f"{m['competition']} {m['season']}\\nTrasmissione: {transmission_for_match(m)}\\nFonte: {m['source']}"
 
         out += [
             "BEGIN:VEVENT",
