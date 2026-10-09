@@ -11,7 +11,7 @@ BEGIN:VEVENT
 UID:1944da65c13cff9d77590f0c@palermo-calendar
 DTSTAMP:20260715T000000Z
 SUMMARY:⚽ Palermo – FC Gherdëina
-DESCRIPTION:Amichevole 2026/27\\nFonte: dato ufficiale già confermato
+DESCRIPTION:Amichevole 2026/27\\nTrasmissione: Trasmissione da confermare\\nFonte: dato ufficiale già confermato
 TRANSP:TRANSPARENT
 LOCATION:Centro Sportivo Mulin da Coi\, Santa Cristina in Valgardena (BZ)
 DTSTART;TZID=Europe/Rome:20260715T173000
@@ -26,7 +26,7 @@ BEGIN:VEVENT
 UID:cac643b65905180db3d74565@palermo-calendar
 DTSTAMP:20260718T000000Z
 SUMMARY:⚽ Palermo – FC Ingolstadt 04
-DESCRIPTION:Amichevole 2026/27\\nFonte: dato ufficiale già confermato
+DESCRIPTION:Amichevole 2026/27\\nTrasmissione: Trasmissione da confermare\\nFonte: dato ufficiale già confermato
 TRANSP:TRANSPARENT
 LOCATION:Centro Sportivo Mulin da Coi\, Santa Cristina in Valgardena (BZ)
 DTSTART;TZID=Europe/Rome:20260718T160000
@@ -41,7 +41,7 @@ BEGIN:VEVENT
 UID:60296a18f5ff72b588ac130c@palermo-calendar
 DTSTAMP:20260722T000000Z
 SUMMARY:⚽ Palermo – FC Paradiso
-DESCRIPTION:Amichevole 2026/27\\nFonte: dato ufficiale già confermato
+DESCRIPTION:Amichevole 2026/27\\nTrasmissione: Trasmissione da confermare\\nFonte: dato ufficiale già confermato
 TRANSP:TRANSPARENT
 LOCATION:Centro Sportivo Mulin da Coi\, Santa Cristina in Valgardena (BZ)
 DTSTART;TZID=Europe/Rome:20260722T171500
@@ -56,7 +56,7 @@ BEGIN:VEVENT
 UID:9cdb36fe015e846d02fe2559@palermo-calendar
 DTSTAMP:20260725T000000Z
 SUMMARY:⚽ Palermo – FC Nürnberg
-DESCRIPTION:Amichevole 2026/27\\nFonte: dato ufficiale già confermato
+DESCRIPTION:Amichevole 2026/27\\nTrasmissione: Trasmissione da confermare\\nFonte: dato ufficiale già confermato
 TRANSP:TRANSPARENT
 LOCATION:Tennisverein Vahrn\, Varna (BZ)
 DTSTART;TZID=Europe/Rome:20260725T163000
@@ -71,7 +71,7 @@ BEGIN:VEVENT
 UID:f7ca4f80177e3647dacf4d8e@palermo-calendar
 DTSTAMP:20260729T000000Z
 SUMMARY:⚽ Palermo – FC Iraklis 1908
-DESCRIPTION:Amichevole 2026/27\\nFonte: dato ufficiale già confermato
+DESCRIPTION:Amichevole 2026/27\\nTrasmissione: Trasmissione da confermare\\nFonte: dato ufficiale già confermato
 TRANSP:TRANSPARENT
 LOCATION:Centro Sportivo Mulin da Coi\, Santa Cristina in Valgardena (BZ)
 DTSTART;TZID=Europe/Rome:20260729T170000
@@ -86,7 +86,7 @@ BEGIN:VEVENT
 UID:a3589b649624bb5bef517aac@palermo-calendar
 DTSTAMP:20260807T000000Z
 SUMMARY:⚽ Palermo – Melbourne City
-DESCRIPTION:Anglo-Palermitan Trophy 2026/27\\nFonte: dato ufficiale già confermato
+DESCRIPTION:Anglo-Palermitan Trophy 2026/27\\nTrasmissione: Trasmissione da confermare\\nFonte: dato ufficiale già confermato
 TRANSP:TRANSPARENT
 LOCATION:Sam Kerr Football Centre\, Perth
 DTSTART;TZID=Europe/Rome:20260807T130000
@@ -101,7 +101,7 @@ BEGIN:VEVENT
 UID:9dfc58f6980d05c28dbe6cd5@palermo-calendar
 DTSTAMP:20260811T000000Z
 SUMMARY:⚽ Juventus – Palermo
-DESCRIPTION:Amichevole 2026/27\\nFonte: dato ufficiale già confermato
+DESCRIPTION:Amichevole 2026/27\\nTrasmissione: Trasmissione da confermare\\nFonte: dato ufficiale già confermato
 TRANSP:TRANSPARENT
 LOCATION:HBF Park\, Perth
 DTSTART;TZID=Europe/Rome:20260811T120000
@@ -116,7 +116,7 @@ BEGIN:VEVENT
 UID:ff3941598e3606755f970be0@palermo-calendar
 DTSTAMP:20260817T000000Z
 SUMMARY:⚽ Palermo – Lecce
-DESCRIPTION:Coppa Italia Frecciarossa 2026/27\\nFonte: Palermo FC (https://www.palermofc.com/it)
+DESCRIPTION:Coppa Italia Frecciarossa 2026/27\\nTrasmissione: Mediaset (TV)\; Mediaset Infinity (streaming)\\nFonte: Palermo FC (https://www.palermofc.com/it)
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;TZID=Europe/Rome:20260817T211500
@@ -131,7 +131,7 @@ BEGIN:VEVENT
 UID:350a0232753a979cf2d53dea@palermo-calendar
 DTSTAMP:20260823T000000Z
 SUMMARY:⚽ Palermo – Juve Stabia
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;TZID=Europe/Rome:20260823T210000
@@ -146,7 +146,7 @@ BEGIN:VEVENT
 UID:54f6e3addb5008931ab65355@palermo-calendar
 DTSTAMP:20260830T000000Z
 SUMMARY:⚽ Arezzo – Palermo
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Città di Arezzo
 DTSTART;TZID=Europe/Rome:20260830T190000
@@ -161,7 +161,7 @@ BEGIN:VEVENT
 UID:355f028725458e9b74a5334b@palermo-calendar
 DTSTAMP:20260903T000000Z
 SUMMARY:⚽ Palermo – Mantova
-DESCRIPTION:Coppa Italia Frecciarossa 2026/27\\nFonte: Palermo FC (https://www.palermofc.com/it)
+DESCRIPTION:Coppa Italia Frecciarossa 2026/27\\nTrasmissione: Mediaset (TV)\; Mediaset Infinity (streaming)\\nFonte: Palermo FC (https://www.palermofc.com/it)
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;TZID=Europe/Rome:20260903T180000
@@ -176,7 +176,7 @@ BEGIN:VEVENT
 UID:9174c4874d49157b712a4579@palermo-calendar
 DTSTAMP:20260907T000000Z
 SUMMARY:⚽ Palermo – Sampdoria
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;TZID=Europe/Rome:20260907T203000
@@ -191,7 +191,7 @@ BEGIN:VEVENT
 UID:b0eb53ac7598b239d473eb35@palermo-calendar
 DTSTAMP:20260913T000000Z
 SUMMARY:⚽ Avellino – Palermo
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Partenio-Adriano Lombardi
 DTSTART;TZID=Europe/Rome:20260913T171500
@@ -206,7 +206,7 @@ BEGIN:VEVENT
 UID:7eb2e964b4fa3d7bea6348d1@palermo-calendar
 DTSTAMP:20260919T000000Z
 SUMMARY:⚽ Palermo – Padova
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;TZID=Europe/Rome:20260919T150000
@@ -221,7 +221,7 @@ BEGIN:VEVENT
 UID:5a7d6bbc8c55af5e810697b3@palermo-calendar
 DTSTAMP:20261010T000000Z
 SUMMARY:⚽ Empoli – Palermo
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Carlo Castellani – Computer Gross Arena
 DTSTART;TZID=Europe/Rome:20261010T150000
@@ -236,7 +236,7 @@ BEGIN:VEVENT
 UID:4d8ae2e2e4d0613c9a4c6b3b@palermo-calendar
 DTSTAMP:20261017T000000Z
 SUMMARY:⚽ Mantova – Palermo
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Danilo Martelli – Pata Stadium
 DTSTART;TZID=Europe/Rome:20261017T171500
@@ -251,7 +251,7 @@ BEGIN:VEVENT
 UID:ad480733f2b45c74efb26944@palermo-calendar
 DTSTAMP:20261025T000000Z
 SUMMARY:⚽ Palermo – Carrarese
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;TZID=Europe/Rome:20261025T150000
@@ -266,7 +266,7 @@ BEGIN:VEVENT
 UID:a2d988c83a039eeb6c66982f@palermo-calendar
 DTSTAMP:20261028T000000Z
 SUMMARY:⚽ Pisa – Palermo
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Arena Garibaldi - Stadio Romeo Anconetani
 DTSTART;TZID=Europe/Rome:20261028T190000
@@ -281,7 +281,7 @@ BEGIN:VEVENT
 UID:7fe399651ff084503b456180@palermo-calendar
 DTSTAMP:20261101T000000Z
 SUMMARY:⚽ Palermo – L.R. Vicenza
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;TZID=Europe/Rome:20261101T193000
@@ -296,7 +296,7 @@ BEGIN:VEVENT
 UID:02d25b8946893c37523bc120@palermo-calendar
 DTSTAMP:20261106T000000Z
 SUMMARY:⚽ Ascoli – Palermo
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Cino e Lillo Del Duca
 DTSTART;TZID=Europe/Rome:20261106T203000
@@ -311,7 +311,7 @@ BEGIN:VEVENT
 UID:d1cc1b05194c4eca8afa0e54@palermo-calendar
 DTSTAMP:20261121T000000Z
 SUMMARY:⚽ Catanzaro – Palermo
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Nicola Ceravolo
 DTSTART;TZID=Europe/Rome:20261121T171500
@@ -326,7 +326,7 @@ BEGIN:VEVENT
 UID:e3da936e9e902abaf0641035@palermo-calendar
 DTSTAMP:20261124T000000Z
 SUMMARY:⚽ Palermo – Südtirol
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;TZID=Europe/Rome:20261124T200000
@@ -341,7 +341,7 @@ BEGIN:VEVENT
 UID:e7f611296f753a0c6345824c@palermo-calendar
 DTSTAMP:20261128T000000Z
 SUMMARY:⚽ Palermo – Benevento
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;TZID=Europe/Rome:20261128T193000
@@ -356,7 +356,7 @@ BEGIN:VEVENT
 UID:87ce74b33415631200942aec@palermo-calendar
 DTSTAMP:20261206T000000Z
 SUMMARY:⚽ Hellas Verona – Palermo
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Marcantonio Bentegodi
 DTSTART;TZID=Europe/Rome:20261206T171500
@@ -371,7 +371,7 @@ BEGIN:VEVENT
 UID:3e849518859b25c94a2f07fb@palermo-calendar
 DTSTAMP:20261209T000000Z
 SUMMARY:⚽ Palermo – Cremonese
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;TZID=Europe/Rome:20261209T200000
@@ -386,7 +386,7 @@ BEGIN:VEVENT
 UID:17ef57b7ed5c424db3481048@palermo-calendar
 DTSTAMP:20261212T000000Z
 SUMMARY:⚽ Cesena – Palermo
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Orogel Stadium - Dino Manuzzi
 DTSTART;TZID=Europe/Rome:20261212T171500
@@ -401,7 +401,7 @@ BEGIN:VEVENT
 UID:4de61f6c419ba205e7193d87@palermo-calendar
 DTSTAMP:20261220T000000Z
 SUMMARY:⚽ Palermo – Virtus Entella
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;TZID=Europe/Rome:20261220T171500
@@ -416,7 +416,7 @@ BEGIN:VEVENT
 UID:f025467c98f963829a0050d6@palermo-calendar
 DTSTAMP:20261227T000000Z
 SUMMARY:⚽ Modena – Palermo
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Alberto Braglia
 DTSTART;TZID=Europe/Rome:20261227T123000
@@ -431,7 +431,7 @@ BEGIN:VEVENT
 UID:82c839763c0642c0a1d0bf15@palermo-calendar
 DTSTAMP:20270109T000000Z
 SUMMARY:⚽ Palermo – Empoli
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;TZID=Europe/Rome:20270109T171500
@@ -446,7 +446,7 @@ BEGIN:VEVENT
 UID:ebb8988c65dd187de6b10828@palermo-calendar
 DTSTAMP:20270116T000000Z
 SUMMARY:⚽ Palermo – Pisa
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;VALUE=DATE:20270116
@@ -457,7 +457,7 @@ BEGIN:VEVENT
 UID:c695e8e63f9b014c83622ef1@palermo-calendar
 DTSTAMP:20270123T000000Z
 SUMMARY:⚽ Südtirol – Palermo
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Marco Druso
 DTSTART;VALUE=DATE:20270123
@@ -468,7 +468,7 @@ BEGIN:VEVENT
 UID:c00fa1d2730b40546bc9187e@palermo-calendar
 DTSTAMP:20270130T000000Z
 SUMMARY:⚽ Palermo – Arezzo
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;VALUE=DATE:20270130
@@ -479,7 +479,7 @@ BEGIN:VEVENT
 UID:f62781466eade367a39d9c3a@palermo-calendar
 DTSTAMP:20270206T000000Z
 SUMMARY:⚽ L.R. Vicenza – Palermo
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Romeo Menti
 DTSTART;VALUE=DATE:20270206
@@ -490,7 +490,7 @@ BEGIN:VEVENT
 UID:fc81c35ed2f83d6517fe4e3f@palermo-calendar
 DTSTAMP:20270213T000000Z
 SUMMARY:⚽ Palermo – Mantova
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;VALUE=DATE:20270213
@@ -501,7 +501,7 @@ BEGIN:VEVENT
 UID:513dd86df666434e8809d383@palermo-calendar
 DTSTAMP:20270220T000000Z
 SUMMARY:⚽ Cremonese – Palermo
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Giovanni Zini
 DTSTART;VALUE=DATE:20270220
@@ -512,7 +512,7 @@ BEGIN:VEVENT
 UID:8321ec8fac72bdaddf9be29c@palermo-calendar
 DTSTAMP:20270227T000000Z
 SUMMARY:⚽ Palermo – Hellas Verona
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;VALUE=DATE:20270227
@@ -523,7 +523,7 @@ BEGIN:VEVENT
 UID:b0f90aebd1f26b4ca151d8cb@palermo-calendar
 DTSTAMP:20270302T000000Z
 SUMMARY:⚽ Carrarese – Palermo
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Arena Garibaldi - Stadio Romeo Anconetani
 DTSTART;VALUE=DATE:20270302
@@ -534,7 +534,7 @@ BEGIN:VEVENT
 UID:3d27f68d5ed184401d7bcbb5@palermo-calendar
 DTSTAMP:20270306T000000Z
 SUMMARY:⚽ Palermo – Modena
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;VALUE=DATE:20270306
@@ -545,7 +545,7 @@ BEGIN:VEVENT
 UID:1c7916d425c595518513dbca@palermo-calendar
 DTSTAMP:20270313T000000Z
 SUMMARY:⚽ Juve Stabia – Palermo
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Comunale Romeo Menti
 DTSTART;VALUE=DATE:20270313
@@ -556,7 +556,7 @@ BEGIN:VEVENT
 UID:441fde770c8d5a5907708520@palermo-calendar
 DTSTAMP:20270320T000000Z
 SUMMARY:⚽ Padova – Palermo
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Comunale Euganeo
 DTSTART;VALUE=DATE:20270320
@@ -567,7 +567,7 @@ BEGIN:VEVENT
 UID:23d0de6a6746444aa719525a@palermo-calendar
 DTSTAMP:20270403T000000Z
 SUMMARY:⚽ Palermo – Avellino
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;VALUE=DATE:20270403
@@ -578,7 +578,7 @@ BEGIN:VEVENT
 UID:27af34a21e5226a075c0c91d@palermo-calendar
 DTSTAMP:20270410T000000Z
 SUMMARY:⚽ Sampdoria – Palermo
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Comunale Luigi Ferraris
 DTSTART;VALUE=DATE:20270410
@@ -589,7 +589,7 @@ BEGIN:VEVENT
 UID:1a95501cd4b79f369ed97093@palermo-calendar
 DTSTAMP:20270417T000000Z
 SUMMARY:⚽ Palermo – Ascoli
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;VALUE=DATE:20270417
@@ -600,7 +600,7 @@ BEGIN:VEVENT
 UID:00fc4b5cafd1dffeef9ceb17@palermo-calendar
 DTSTAMP:20270424T000000Z
 SUMMARY:⚽ Virtus Entella – Palermo
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Enrico Sannazzari
 DTSTART;VALUE=DATE:20270424
@@ -611,7 +611,7 @@ BEGIN:VEVENT
 UID:a55150295018bd7f8c0bf8ff@palermo-calendar
 DTSTAMP:20270501T000000Z
 SUMMARY:⚽ Palermo – Catanzaro
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;VALUE=DATE:20270501
@@ -622,7 +622,7 @@ BEGIN:VEVENT
 UID:167b288f71e394031f66d06d@palermo-calendar
 DTSTAMP:20270508T000000Z
 SUMMARY:⚽ Benevento – Palermo
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Ciro Vigorito
 DTSTART;VALUE=DATE:20270508
@@ -633,7 +633,7 @@ BEGIN:VEVENT
 UID:7d4441a4cf7af2bfe02d0510@palermo-calendar
 DTSTAMP:20270514T000000Z
 SUMMARY:⚽ Palermo – Cesena
-DESCRIPTION:Serie BKT 2026/27\\nFonte: Lega Serie B
+DESCRIPTION:Serie BKT 2026/27\\nTrasmissione: DAZN\; LaB Channel (Prime Video\, OneFootball)\\nFonte: Lega Serie B
 TRANSP:TRANSPARENT
 LOCATION:Stadio Renzo Barbera
 DTSTART;VALUE=DATE:20270514
