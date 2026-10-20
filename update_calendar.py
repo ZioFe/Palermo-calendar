@@ -455,6 +455,9 @@ def parse_match_page(html, start, url):
         return None
 
     home, away = teams[0], teams[1]
+    # Le voci dell’interfaccia (es. "Cerca") non sono squadre.
+    if home.casefold() in {"cerca", "search", "calendario"} or away.casefold() in {"cerca", "search", "calendario"}:
+        return None
     if "palermo" not in {home.lower(), away.lower()}:
         return None
 
@@ -697,6 +700,8 @@ def build_calendar(matches):
         "X-PUBLISHED-TTL:PT6H",
     ]
 
+    # Ultima difesa contro squadre spurie estratte dalla navigazione del sito.
+    matches = [m for m in matches if not ({m["home"].casefold(), m["away"].casefold()} & {"cerca", "search", "calendario"})]
     matches = sorted(matches, key=lambda m: (m["date"], m["time"] or "99:99"))
 
     for m in matches:
