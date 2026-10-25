@@ -734,11 +734,6 @@ def build_calendar(matches):
             out += [
                 f"DTSTART;TZID=Europe/Rome:{start_dt.strftime('%Y%m%dT%H%M%S')}",
                 f"DTEND;TZID=Europe/Rome:{end_dt.strftime('%Y%m%dT%H%M%S')}",
-                "BEGIN:VALARM",
-                "TRIGGER:-PT1H",
-                "ACTION:DISPLAY",
-                f"DESCRIPTION:{esc(title)} tra 1 ora",
-                "END:VALARM",
             ]
         else:
             out += [
