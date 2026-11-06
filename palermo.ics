@@ -268,6 +268,15 @@ DTSTART;TZID=Europe/Rome:20261212T171500
 DTEND;TZID=Europe/Rome:20261212T191500
 END:VEVENT
 BEGIN:VEVENT
+UID:d87f5e431d5f8c79e767abac@palermo-calendar
+DTSTAMP:20261215T000000Z
+SUMMARY:⚽ Bologna – Palermo
+DESCRIPTION:Coppa Italia Frecciarossa 2026/27\\nTrasmissione: Mediaset (TV)\; Mediaset Infinity (streaming)\\nFonte: Palermo FC (https://www.palermofc.com/it)
+TRANSP:TRANSPARENT
+DTSTART;TZID=Europe/Rome:20261215T210000
+DTEND;TZID=Europe/Rome:20261215T230000
+END:VEVENT
+BEGIN:VEVENT
 UID:4de61f6c419ba205e7193d87@palermo-calendar
 DTSTAMP:20261220T000000Z
 SUMMARY:⚽ Palermo – Virtus Entella
